@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from .. import models, schemas
 from ..database import get_db
+from .. import oauth2
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -44,20 +45,15 @@ def register(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
 def login(user_data: schemas.UserLogin, db: Session = Depends(get_db)):
     # 1. Ищем пользователя по email
     user = db.query(models.User).filter(models.User.email == user_data.email).first()
-    
-    # 2. Если пользователя нет — ошибка
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверный email или пароль"
-        )
+        raise HTTPException(status_code=401, detail="Неверный email или пароль")
     
-    # 3. Проверяем пароль
+    # 2. Проверяем пароль
     if not pwd_context.verify(user_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверный email или пароль"
-        )
+        raise HTTPException(status_code=401, detail="Неверный email или пароль")
     
-    # 4. Возвращаем успех (токен добавим чуть позже)
-    return {"message": "Вход выполнен успешно", "user_id": user.id, "email": user.email}
+    # 3. Создаем JWT-токен
+    access_token = oauth2.create_access_token(data={"sub": user.email})
+    
+    # 4. Возвращаем токен
+    return {"access_token": access_token, "token_type": "bearer"}
