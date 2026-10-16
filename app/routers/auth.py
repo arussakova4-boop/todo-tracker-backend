@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from .. import models, schemas
@@ -42,9 +43,9 @@ def register(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 @router.post("/login")
-def login(user_data: schemas.UserLogin, db: Session = Depends(get_db)):
-    # 1. Ищем пользователя по email
-    user = db.query(models.User).filter(models.User.email == user_data.email).first()
+def login(user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # 1. Ищем пользователя по email (в форме OAuth2 это поле называется username)
+    user = db.query(models.User).filter(models.User.email == user_data.username).first()
     if not user:
         raise HTTPException(status_code=401, detail="Неверный email или пароль")
     

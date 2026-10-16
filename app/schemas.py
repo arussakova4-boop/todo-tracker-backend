@@ -22,3 +22,31 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True  # Позволяет читать данные из ORM-моделей
+
+# --- Схемы для задач ---
+
+class TaskCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    priority: Optional[int] = 1
+    estimated_time: Optional[int] = None
+
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    is_done: Optional[bool] = None
+    priority: Optional[int] = None
+    estimated_time: Optional[int] = None
+
+class TaskResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    is_done: bool
+    priority: int
+    estimated_time: Optional[int] = None
+    created_at: datetime
+    owner_id: int
+
+    class Config:
+        from_attributes = True
