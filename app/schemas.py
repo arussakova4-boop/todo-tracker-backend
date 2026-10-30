@@ -1,17 +1,12 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
 
-# Схема для регистрации (что присылает пользователь)
+# Схема для входа (что присылает пользователь)
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=6)  # <-- пароль минимум 6 символов
     name: Optional[str] = None
-
-# Схема для входа (что присылает пользователь)
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
 
 # Схема для ответа (что сервер отдает пользователю)
 class UserResponse(BaseModel):
