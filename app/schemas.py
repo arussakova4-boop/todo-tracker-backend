@@ -21,7 +21,7 @@ class UserResponse(BaseModel):
 # --- Схемы для задач ---
 
 class TaskCreate(BaseModel):
-    title: str
+    title: str = Field(min_length=1)
     description: Optional[str] = None
     priority: Optional[int] = 1
     estimated_time: Optional[int] = None
