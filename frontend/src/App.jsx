@@ -66,7 +66,7 @@ function App() {
 const styles = {
   container: { maxWidth: '600px', margin: '40px auto', fontFamily: 'Arial, sans-serif', padding: '0 20px' },
   
-   
+  // 👇 ИСПРАВЛЕННЫЙ СТИЛЬ ЗАГОЛОВКА (уменьшен шрифт, добавлены отступы)
   title: { 
     textAlign: 'center', 
     color: '#333', 
