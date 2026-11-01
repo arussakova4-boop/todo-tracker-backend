@@ -28,7 +28,9 @@ class Task(Base):
     priority = Column(Integer, default=1)           # Приоритет (1-3)
     estimated_time = Column(Integer, nullable=True) # Оценка времени в минутах
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
+    due_date = Column(DateTime, nullable=True)  # <-- НОВОЕ ПОЛЕ (дата дедлайна)
+
     # Внешний ключ на пользователя
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="tasks")

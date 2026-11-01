@@ -25,6 +25,7 @@ class TaskCreate(BaseModel):
     description: Optional[str] = None
     priority: Optional[int] = 1
     estimated_time: Optional[int] = None
+    due_date: Optional[datetime] = None  # <-- НОВОЕ ПОЛЕ
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -32,6 +33,7 @@ class TaskUpdate(BaseModel):
     is_done: Optional[bool] = None
     priority: Optional[int] = None
     estimated_time: Optional[int] = None
+    due_date: Optional[datetime] = None  # <-- НОВОЕ ПОЛЕ
 
 class TaskResponse(BaseModel):
     id: int
@@ -42,6 +44,7 @@ class TaskResponse(BaseModel):
     estimated_time: Optional[int] = None
     created_at: datetime
     owner_id: int
+    due_date: Optional[datetime] = None  # <-- НОВОЕ ПОЛЕ
 
     class Config:
         from_attributes = True
