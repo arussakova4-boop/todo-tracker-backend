@@ -1,62 +1,87 @@
- import { useState } from 'react';
+import { useState } from 'react';
 
 function App() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage('Загрузка...');
-    try {
-      const formData = new URLSearchParams();
-      formData.append('username', email);
-      formData.append('password', password);
-      const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData,
-      });
-      if (response.ok) {
-        setMessage('Успешный вход! 🎉');
-      } else {
-        setMessage('Ошибка: Неверный email или пароль');
-      }
-    } catch (error) {
-      setMessage('Ошибка сети. Сервер не отвечает.');
-    }
+  const addTask = () => {
+    if (newTask.trim() === '') return;
+    const newTaskObj = {
+      id: Date.now(),
+      title: newTask,
+      completed: false,
+    };
+    setTasks([...tasks, newTaskObj]);
+    setNewTask('');
+  };
+
+  const toggleTask = (id) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Вход в To-Do Tracker</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Email:</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={styles.input} />
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Пароль:</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={styles.input} />
-          </div>
-          <button type="submit" style={styles.button}>Войти</button>
-        </form>
-        {message && <p style={{ textAlign: 'center', marginTop: '15px', color: message.includes('Ошибка') || message.includes('не отвечает') ? 'red' : 'green' }}>{message}</p>}
+      <h1 style={styles.title}>Главная страница со списком задач</h1>
+      
+      <div style={styles.inputContainer}>
+        <input 
+          type="text" 
+          value={newTask} 
+          onChange={(e) => setNewTask(e.target.value)} 
+          placeholder="Введите новую задачу" 
+          style={styles.input}
+        />
+        <button onClick={addTask} style={styles.addButton}>+</button>
       </div>
+
+      <ul style={styles.list}>
+        {tasks.map((task) => (
+          <li key={task.id} style={styles.listItem}>
+            <span 
+              onClick={() => toggleTask(task.id)} 
+              style={{ 
+                ...styles.taskText, 
+                textDecoration: task.completed ? 'line-through' : 'none',
+                color: task.completed ? '#888' : '#333'
+              }}
+            >
+              {task.title}
+            </span>
+            <button onClick={() => deleteTask(task.id)} style={styles.deleteButton}>
+              Удалить
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 const styles = {
-  container: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0f2f5', fontFamily: 'Arial, sans-serif' },
-  card: { backgroundColor: 'white', padding: '40px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', width: '350px' },
-  title: { textAlign: 'center', marginBottom: '20px', color: '#333' },
-  form: { display: 'flex', flexDirection: 'column', gap: '15px' },
-  inputGroup: { display: 'flex', flexDirection: 'column', gap: '5px' },
-  label: { fontSize: '14px', color: '#555' },
-  input: { padding: '10px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '16px' },
-  button: { padding: '12px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', fontSize: '16px', cursor: 'pointer', marginTop: '10px' }
+  container: { maxWidth: '600px', margin: '40px auto', fontFamily: 'Arial, sans-serif', padding: '0 20px' },
+  
+   
+  title: { 
+    textAlign: 'center', 
+    color: '#333', 
+    fontSize: '24px', 
+    marginBottom: '30px', 
+    wordWrap: 'break-word' 
+  },
+  
+  inputContainer: { display: 'flex', gap: '10px', marginBottom: '20px' },
+  input: { flex: 1, padding: '10px', fontSize: '16px', borderRadius: '5px', border: '1px solid #ccc' },
+  addButton: { padding: '10px 20px', fontSize: '20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' },
+  list: { listStyle: 'none', padding: 0 },
+  listItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee' },
+  taskText: { cursor: 'pointer', fontSize: '18px' },
+  deleteButton: { padding: '5px 10px', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }
 };
 
 export default App;
