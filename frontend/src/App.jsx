@@ -8,14 +8,16 @@ function App() {
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   
-  // Состояние для токена (пока просто вводим вручную для теста)
   const [token, setToken] = useState(localStorage.getItem('token') || '');
+  
+  // Базовый URL твоего сервера на Render
+  const API_URL = 'https://todo-tracker-backend-85p8.onrender.com';
 
   // 1. Загрузка задач при старте (GET)
   useEffect(() => {
-    if (!token) return; // Если нет токена, не грузим
+    if (!token) return;
 
-    fetch('http://127.0.0.1:8000/api/tasks/', {
+    fetch(`${API_URL}/api/tasks/`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -35,12 +37,12 @@ function App() {
     const newTask = {
       title: title,
       description: description,
-      due_date: dueDate ? `${dueDate}T12:00:00` : null, // Формат даты для бэка
+      due_date: dueDate ? `${dueDate}T12:00:00` : null,
       priority: 1
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/tasks/', {
+      const response = await fetch(`${API_URL}/api/tasks/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +53,7 @@ function App() {
 
       if (response.ok) {
         const createdTask = await response.json();
-        setTasks([...tasks, createdTask]); // Добавляем в список
+        setTasks([...tasks, createdTask]);
         setTitle('');
         setDescription('');
         setDueDate('');
@@ -67,7 +69,7 @@ function App() {
   // 3. Удаление задачи (DELETE)
   const deleteTask = async (id) => {
     try {
-      await fetch(`http://127.0.0.1:8000/api/tasks/${id}`, {
+      await fetch(`${API_URL}/api/tasks/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -79,7 +81,6 @@ function App() {
     }
   };
 
-  // Вспомогательная кнопка для ввода токена (для теста)
   const handleLogin = () => {
     const newToken = prompt("Вставь сюда access_token из Swagger:");
     if (newToken) {
@@ -94,7 +95,6 @@ function App() {
         Главная страница со списком задач
       </h1>
 
-      {/* Кнопка для ввода токена (в будущем заменим на экран логина) */}
       {!token && (
         <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-2 rounded mb-4">
           Войти (ввести токен)
@@ -128,7 +128,6 @@ function App() {
         ))}
       </ul>
 
-      {/* Модальное окно (оставил как было у Леры) */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md">
@@ -187,4 +186,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
